@@ -1,0 +1,173 @@
+.chat {
+    flex: 2;
+    border-right: 2px solid #dddddd35;
+    border-left: 2px solid #dddddd35;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+}
+
+/* Top Section */
+.top {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #dddddd35;
+}
+
+.chat .top .user {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+}
+
+.chat .top .user > img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat .top .user .texts {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.chat .top .user .texts span {
+    font-size: 18px;
+    font-weight: bold;
+}
+.chat .top .user .texts p {
+    font-size: 14px;
+    font-weight: 300;
+    color: #a5a5a5;
+    width: 75%;
+}
+
+/* Center Section */
+.center {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
+
+.center .message {
+    max-width: 70%;
+    display: flex;
+    gap: 20px;
+}
+
+.center .message .texts .sent-image {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.center .message .user-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.center .message .texts {
+    flex:1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+}
+
+.center .message .texts p {
+    padding: 20px;
+    background-color: rgba(17, 25, 40, 0.3);
+    border-radius: 10px;
+}
+
+.center .own {
+    align-self: flex-end;
+}
+
+.center .own .texts p {
+    background-color: #5183fe;
+}
+
+.center .message span {
+    font-size: 12px;
+}
+
+
+/* Bottom Section */
+.bottom {
+    margin-top: auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #dddddd35;
+    gap: 20px;
+}
+
+.bottom textarea {
+    background-color: rgba(17, 25, 40, 0.5);
+    border:none;
+    color: lightgoldenrodyellow;
+    flex:1;
+    outline: none;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    resize: none;
+}
+
+
+.bottom .sendButton {
+    background-color: #1a73e8e1;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.bottom .sendButton:hover {
+    background-color: #0e74f8;
+}
+
+.emoji {
+    position: relative;
+}
+
+.emojiPicker {
+    position: absolute;
+    bottom: 20px;
+    left: 15px;
+}
+
+.msgSent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(0, 255, 123, 0.913);
+    color: black;
+}
+
+.full-image {
+    position: absolute;
+    object-fit: contain;
+    width: 70%;
+    height: 80%;
+    top: 10%;
+    left: 15%;
+}

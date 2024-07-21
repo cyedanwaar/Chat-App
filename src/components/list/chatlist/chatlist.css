@@ -1,0 +1,78 @@
+.chatlist {
+    padding: 20px;
+    flex: 1;
+    overflow: scroll;
+    scrollbar-width: thin;
+}
+
+.chatlist .search {
+    display: flex;
+    align-items: center;
+}
+
+.chatlist .search .searchBar {
+    flex: 1;
+    background-color: rgba(17, 25, 40, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.chatlist .search .searchBar > img {
+    width:20px;
+    height: 20px;
+}
+
+.chatlist .search .searchBar input {
+    background-color: transparent;
+    border:none;
+    color: lightgoldenrodyellow;
+    flex:1;
+    outline: none;
+    padding: 0 10px;
+}
+
+.add {
+    width: 37px;
+    height: 37px;
+    padding: 10px;
+    margin-left: 10px;
+    background-color: rgba(17, 25, 40, 0.5);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all;
+}
+
+.chatlist > .item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #dddddd35;
+}
+
+.chatlist > .item > img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chatlist > .item > .text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.chatlist > .item > .text > span {
+    font-weight: 500;
+}
+
+.chatlist > .item > .text > p {
+    font-size: 14px;
+    font-weight: 300;
+}
