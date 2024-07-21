@@ -40,11 +40,12 @@
     justify-content: space-between;
     cursor: pointer;
     text-decoration: underline;
+    margin-right: 10px;
 }
 
 .login > .item > form > label > img {
-    width: 40%;
-    height: 40%;
+    width: 200px;
+    height: 200px;
     border-radius: 10px;
     object-fit: cover;
     opacity: 0.6;
@@ -65,7 +66,34 @@
     background-color: #0e74f8;
 }
 
+.login > .item > form > button:disabled {
+    background-color: #1a73e8e1;
+    cursor: not-allowed;
+}
+
 .login > .separator {
     height: 80%;
     width: 2px;background-color: #dddddd35;
+}
+
+.loader {
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    position: absolute;
+    top: 50%;
+    left: 47%;
+    background: #dddddd35;
+    color: black;
+    z-index: 1000;
+    animation: loading 1s ease-in-out 1s infinite;
+}
+
+@keyframes loading {
+    from {
+        background-color: #dddddd35;
+    }
+    to{
+        background-color: rgb(168, 168, 168);
+    }
 }

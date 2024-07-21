@@ -1,6 +1,12 @@
 import "./detail.css"
+import { signOut } from "firebase/auth"
+import { auth } from "../../lib/firebase"
+import { toast } from "react-toastify"
 
 export function Detail(){
+
+    
+
     return(
         <div className="detail">
             <div className="user">
@@ -115,7 +121,7 @@ export function Detail(){
                 </div>
 
                 <button>Block User</button>
-                <button className="logout">Logout</button>
+                <button onClick={()=>auth.signOut()} className="logout">Logout</button>
 
             </div>
         </div>
