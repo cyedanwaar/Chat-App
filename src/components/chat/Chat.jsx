@@ -1,12 +1,19 @@
 import { useState, useEffect, useRef } from "react"
 import "./chat.css"
 import EmojiPicker from "emoji-picker-react"
-import { onSnapshot, doc } from "firebase/firestore"
+import { onSnapshot, doc, arrayUnion, getDoc, updateDoc } from "firebase/firestore"
 import {db} from "../../lib/firebase"
 import { useChatStore } from "../../lib/chatStore "
+import { useUserStore } from "../../lib/userStore"
 
 
 export function Chat(){
+    const endRef = useRef(null)
+    useEffect(()=>{
+        endRef.current?.scrollIntoView({behavior:"smooth"})
+        console.log("Scroll should be working now...")
+    }, [])
+
     const [open, setOpen] = useState(false)
     const [chat, setChat] = useState('')
     const [text, setText] = useState('')
@@ -14,11 +21,9 @@ export function Chat(){
     const [showDiv, setShowDiv] = useState(false)
     const [showDivMsg, setShowDivMsg] = useState('')
 
-    const {chatId} = useChatStore(); 
+    const {currentUser} = useUserStore(); 
+    const {chatId, user} = useChatStore(); 
 
-    useEffect(()=>{
-        endRef.current?.scrollIntoView({behavior:"smooth"})
-    }, [])
 
 
     useEffect(()=>{
@@ -39,7 +44,7 @@ export function Chat(){
         })
     }
 
-    const endRef = useRef(null)
+    
     const inputRef = useRef(null)
     const inputTextRef = useRef(null)
 
@@ -108,39 +113,79 @@ export function Chat(){
         }
         
 
-    }, [text, inputRef])
+    }, [text, inputRef]);
 
 
     function shDiv(){
-        setShowDiv(true)
+        setShowDiv(true);
         setTimeout(() => {
-            setShowDiv(false)
+            setShowDiv(false);
         }, 1000);
     }
 
-    function sendButtonClicked(){
+    const sendButtonClicked = async () => {
         if(text){
-            setShowDivMsg("Message Sent")
-            shDiv()
-            console.log(text)
-            setText('')
+            setShowDivMsg("Message Sent");
+            shDiv();
+            console.log(text);
+            setText('');
         }else {
-            setShowDivMsg("Empty Message")
-            shDiv()
+            setShowDivMsg("Empty Message");
+            shDiv();
+            return;
         }
+
+        try{
+
+            await updateDoc(doc(db,"chats",chatId), { 
+                messages:arrayUnion({
+                    senderId: currentUser.id,
+                    text,
+                    createdAt: new Date()
+                }),
+            });
+
+            const userIds = [currentUser.id, user.id];
+
+
+            userIds.forEach(async (id)=>{
+
+                const userChatsRef = doc(db, "userchats", id);
+                const userChatsSnapshot = await getDoc(userChatsRef);
+
+                if(userChatsSnapshot.exists()){
+                    const userChatsData = userChatsSnapshot.data();
+                    const chatIndex = userChatsData.chats.findIndex(c => c.chatId === chatId);
+
+                    userChatsData.chats[chatIndex].lastMessage = text;
+                    userChatsData.chats[chatIndex].isSeen = id === currentUser.id ? true : false;
+                    userChatsData.chats[chatIndex].updatedAt = Date.now();
+
+                    await updateDoc(userChatsRef, {
+                        chats:userChatsData.chats,
+
+                    });
+                };
+
+            });
+            
+
+        }catch(err){
+            toast.error(err.message);
+        };
         
     }
 
     function showImage(){
-        const img = document.getElementById('sent-image')
-        img.classList.toggle('sent-image')
-        img.classList.toggle('full-image')
+        const img = document.getElementById('sent-image');
+        img.classList.toggle('sent-image');
+        img.classList.toggle('full-image');
     }
 
     useEffect(()=>{
-        console.log(text)
-        console.log(text.length)
-    },[text])
+        console.log(text);
+        console.log(text.length);
+    },[text]);
 
     return(
         <div id="chat" className="chat">
@@ -167,36 +212,21 @@ export function Chat(){
             {/* Center Section */}
             <div className="center">
 
-                <div className="message">
-                    <img className="user-image" src="./avatar.png" alt="" />
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, quia.</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
+                {chat?.messages?.map(message=>(
 
-                <div className="message own ">
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, quia.</p>
-                        <span>1 min ago</span>
+                    <div className="message own" key={message?.createdAt}>
+                        {message.img && <img className="user-image" src={message.img} alt="" />}
+                        {console.log(message.img)}
+                        <div className="texts">
+                            {message.img &&<img onClick={showImage} id="sent-image" className="sent-image" src={message.img} alt="" />}
+                            <p>{message.text}</p>
+                            {/* <span>{message.createdAt}</span> */}
+                        </div>
                     </div>
-                </div>
+                ))}
+                
 
-                <div className="message">
-                    <img className="user-image" src="./avatar.png" alt="" />
-                    <div className="texts">
-                        <img onClick={showImage} id="sent-image" className="sent-image" src="./freen.jpg" alt="" />
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, quia.</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
 
-                <div className="message own ">
-                    <div className="texts">
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, quia.</p>
-                        <span>1 min ago</span>
-                    </div>
-                </div>
 
                 <div ref={endRef}></div>
 
@@ -217,7 +247,7 @@ export function Chat(){
                     {open && <div className="emojiPicker"><EmojiPicker onEmojiClick={handleEmoji} /></div>}
                 </div>
 
-                <button onClick={()=>{sendButtonClicked()}} className="sendButton">Send</button>
+                <button onClick={sendButtonClicked} className="sendButton">Send</button>
             </div>
         </div>
     )
