@@ -129,6 +129,18 @@
     resize: none;
 }
 
+.bottom > .icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bottom > .icons > label > img {
+    width: 25px;
+    height: 25px;
+    cursor:pointer;
+}
+
 .hidden-span {
     position: absolute;
     white-space: nowrap;

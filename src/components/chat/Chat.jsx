@@ -5,6 +5,7 @@ import { onSnapshot, doc, arrayUnion, getDoc, updateDoc } from "firebase/firesto
 import {db} from "../../lib/firebase"
 import { useChatStore } from "../../lib/chatStore "
 import { useUserStore } from "../../lib/userStore"
+import Upload from "../../lib/upload"
 
 
 export function Chat(){
@@ -20,6 +21,10 @@ export function Chat(){
     const [inputHeight, setInputHeight] = useState(60)
     const [showDiv, setShowDiv] = useState(false)
     const [showDivMsg, setShowDivMsg] = useState('')
+    const [img, setImg] = useState({
+        file: null,
+        url: ""
+    })
 
     const {currentUser} = useUserStore(); 
     const {chatId, user} = useChatStore(); 
@@ -35,6 +40,15 @@ export function Chat(){
             unSub()
         })
     },[chatId])
+
+    const handleImgUpload = (e) =>{
+        if(e.target.files[0]){
+            setImg({
+                file: e.target.files[0],
+                url: URL.createObjectURL(e.target.files[0])
+            })
+        }
+    }
 
     console.log(chat)
 
@@ -135,13 +149,21 @@ export function Chat(){
             return;
         }
 
+        let imgUrl = null
+
+
         try{
+
+            if(img.file){
+                imgUrl = await Upload(img.file)
+            }
 
             await updateDoc(doc(db,"chats",chatId), { 
                 messages:arrayUnion({
                     senderId: currentUser.id,
                     text,
-                    createdAt: new Date()
+                    createdAt: new Date(),
+                    ...(imgUrl && {img:imgUrl})
                 }),
             });
 
@@ -173,7 +195,13 @@ export function Chat(){
         }catch(err){
             toast.error(err.message);
         };
-        
+
+        setImg({
+            file: null,
+            url: ""
+        })
+
+        setText("")
     }
 
     function showImage(){
@@ -214,8 +242,9 @@ export function Chat(){
 
                 {chat?.messages?.map(message=>(
 
-                    <div className="message own" key={message?.createdAt}>
-                        {message.img && <img className="user-image" src={message.img} alt="" />}
+                    <div className={message.senderId === currentUser.id ?"message own":"message" } key={message?.createdAt}>
+                        {(message.senderId !== currentUser.id) && <img className="user-image" src={user.avatar} alt="" />}
+                        {console.log("user", user)}
                         {console.log(message.img)}
                         <div className="texts">
                             {message.img &&<img onClick={showImage} id="sent-image" className="sent-image" src={message.img} alt="" />}
@@ -224,10 +253,11 @@ export function Chat(){
                         </div>
                     </div>
                 ))}
-                
-
-
-
+                {img.url && <div className="message own">
+                    <div className="texts">
+                        <img src={img.url} alt="" />
+                    </div>
+                </div>}
                 <div ref={endRef}></div>
 
             </div>
@@ -235,7 +265,7 @@ export function Chat(){
             {/* Bottom Section */}
             <div className="bottom">
                 <div className="icons">
-                    <img src="./img.png" alt="" />
+                    <label htmlFor="file"><img src="./img.png" alt="" /></label><input type="file" id="file" style={{display:"none"}} onChange={handleImgUpload} />
                     <img src="./camera.png" alt="" />
                     <img src="./mic.png" alt="" />
                 </div>
