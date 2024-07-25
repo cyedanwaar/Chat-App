@@ -1,13 +1,37 @@
 import { useState, useEffect, useRef } from "react"
 import "./chat.css"
 import EmojiPicker from "emoji-picker-react"
+import { onSnapshot, doc } from "firebase/firestore"
+import {db} from "../../lib/firebase"
+import { useChatStore } from "../../lib/chatStore "
+
 
 export function Chat(){
     const [open, setOpen] = useState(false)
+    const [chat, setChat] = useState('')
     const [text, setText] = useState('')
     const [inputHeight, setInputHeight] = useState(60)
     const [showDiv, setShowDiv] = useState(false)
     const [showDivMsg, setShowDivMsg] = useState('')
+
+    const {chatId} = useChatStore(); 
+
+    useEffect(()=>{
+        endRef.current?.scrollIntoView({behavior:"smooth"})
+    }, [])
+
+
+    useEffect(()=>{
+        const unSub = onSnapshot(doc(db, "chats", chatId), (res)=>{
+            setChat(res.data());
+        })
+
+        return (()=>{
+            unSub()
+        })
+    },[chatId])
+
+    console.log(chat)
 
     const handleEmoji = e =>{
         setText(currentText =>{
@@ -17,13 +41,19 @@ export function Chat(){
 
     const endRef = useRef(null)
     const inputRef = useRef(null)
+    const inputTextRef = useRef(null)
+
+    
 
     useEffect(()=>{
-        endRef.current?.scrollIntoView({behavior:"smooth"})
-    }, [])
+        const inputText = text.split("\n");
+        inputText.forEach(line=>{
+            inputTextRef.current.textContent = line
+        })
+        const textWidth = inputTextRef.current.offsetWidth
+        const inputWidth = inputRef.current.offsetWidth
 
-    useEffect(()=>{
-        const inputContainer = inputRef.current
+        console.log(textWidth < inputWidth - 45)
 
         if(text.endsWith('\n') && inputHeight < 200){
             setInputHeight(currentWidth=>{
@@ -107,6 +137,11 @@ export function Chat(){
         img.classList.toggle('full-image')
     }
 
+    useEffect(()=>{
+        console.log(text)
+        console.log(text.length)
+    },[text])
+
     return(
         <div id="chat" className="chat">
 
@@ -128,9 +163,6 @@ export function Chat(){
                     <img src="./info.png" alt="" />
                 </div>
             </div>
-
-
-
 
             {/* Center Section */}
             <div className="center">
@@ -170,16 +202,6 @@ export function Chat(){
 
             </div>
 
-
-
-
-
-
-
-
-
-
-
             {/* Bottom Section */}
             <div className="bottom">
                 <div className="icons">
@@ -189,7 +211,7 @@ export function Chat(){
                 </div>
 
                 <textarea style={{height:`${inputHeight}px`}} ref={inputRef} value={text} onChange={e=>{setText(e.target.value)}} placeholder="Type a message..."  name="" id="" ></textarea>
-
+                <span ref={inputTextRef} className="hidden-span"></span>
                 <div className="emoji icons">
                     <img onClick={()=>{setOpen(e=>!e)}} src={open ? "./minus.png" :"./emoji.png"} alt="" />
                     {open && <div className="emojiPicker"><EmojiPicker onEmojiClick={handleEmoji} /></div>}

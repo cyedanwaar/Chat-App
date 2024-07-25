@@ -129,6 +129,12 @@
     resize: none;
 }
 
+.hidden-span {
+    position: absolute;
+    white-space: nowrap;
+    visibility: hidden;
+    left: -9999px;
+}
 
 .bottom .sendButton {
     background-color: #1a73e8e1;
