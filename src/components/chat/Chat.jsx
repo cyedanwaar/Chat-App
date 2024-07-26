@@ -27,7 +27,7 @@ export function Chat(){
     })
 
     const {currentUser} = useUserStore(); 
-    const {chatId, user} = useChatStore(); 
+    const {chatId, user, isCurrentUserBlocked, isReceiverBlocked} = useChatStore(); 
 
 
 
@@ -204,10 +204,9 @@ export function Chat(){
         setText("")
     }
 
-    function showImage(){
-        const img = document.getElementById('sent-image');
-        img.classList.toggle('sent-image');
-        img.classList.toggle('full-image');
+    function showImage(e){
+        e.target.classList.toggle('sent-image')
+        e.target.classList.toggle('full-image')
     }
 
     useEffect(()=>{
@@ -222,10 +221,9 @@ export function Chat(){
 
             <div className="top">
                 <div className="user">
-                    <img src="./avatar.png" alt="" />
+                    <img src={user?.avatar || "./avatar.png"} alt="" />
                     <div className="texts">
-                        <span>Jane Doe</span>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique quo tenetur neque! Veritatis, nulla praesentium vero expedita id laudantium dolorem!</p>
+                        <span>{user?.username || "Chat User"}</span>
                     </div>
                 </div>
 
@@ -243,11 +241,11 @@ export function Chat(){
                 {chat?.messages?.map(message=>(
 
                     <div className={message.senderId === currentUser.id ?"message own":"message" } key={message?.createdAt}>
-                        {(message.senderId !== currentUser.id) && <img className="user-image" src={user.avatar} alt="" />}
+                        {(message.senderId !== currentUser.id) && <img className="user-image" src={user?.avatar || "avatar.png"} alt="" />}
                         {console.log("user", user)}
                         {console.log(message.img)}
                         <div className="texts">
-                            {message.img &&<img onClick={showImage} id="sent-image" className="sent-image" src={message.img} alt="" />}
+                            {message.img &&<img onClick={ e => showImage(e)} className="sent-image images" src={message.img} alt="" />}
                             <p>{message.text}</p>
                             {/* <span>{message.createdAt}</span> */}
                         </div>
@@ -270,14 +268,14 @@ export function Chat(){
                     <img src="./mic.png" alt="" />
                 </div>
 
-                <textarea style={{height:`${inputHeight}px`}} ref={inputRef} value={text} onChange={e=>{setText(e.target.value)}} placeholder="Type a message..."  name="" id="" ></textarea>
+                <textarea style={{height:`${inputHeight}px`}} ref={inputRef} value={text} onChange={e=>{setText(e.target.value)}} placeholder={isCurrentUserBlocked || isReceiverBlocked ? "You cannot send message" : "Type a message..."}  name="" id="" disabled={isCurrentUserBlocked || isReceiverBlocked} ></textarea>
                 <span ref={inputTextRef} className="hidden-span"></span>
                 <div className="emoji icons">
                     <img onClick={()=>{setOpen(e=>!e)}} src={open ? "./minus.png" :"./emoji.png"} alt="" />
                     {open && <div className="emojiPicker"><EmojiPicker onEmojiClick={handleEmoji} /></div>}
                 </div>
 
-                <button onClick={sendButtonClicked} className="sendButton">Send</button>
+                <button onClick={sendButtonClicked} className="sendButton"  disabled={isCurrentUserBlocked || isReceiverBlocked}>Send</button>
             </div>
         </div>
     )

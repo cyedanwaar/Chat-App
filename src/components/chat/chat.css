@@ -129,6 +129,10 @@
     resize: none;
 }
 
+.bottom textarea:disabled {
+    cursor: not-allowed;
+}
+
 .bottom > .icons {
     display: flex;
     align-items: center;
@@ -155,6 +159,10 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.bottom .sendButton:disabled {
+    cursor: not-allowed;
 }
 
 .bottom .sendButton:hover {
